@@ -51,20 +51,32 @@
     const jobList = document.getElementById("jobList");
 
     form.addEventListener("submit", async (e) => {
-      e.preventDefault();
+  e.preventDefault();
 
-      const { error } = await supabase
-        .from("job_cards")
-        .insert([
-          {
-            date: document.getElementById("date").value,
-            shift: document.getElementById("shift").value,
-            product: document.getElementById("product").value,
-            wo_number: document.getElementById("wo").value,
-            target_quantity: parseInt(document.getElementById("target").value),
-            status: "open"
-          }
-        ]);
+  const { data, error } = await supabase
+    .from("job_cards")
+    .insert([
+      {
+        date: document.getElementById("date").value,
+        shift: document.getElementById("shift").value,
+        product: document.getElementById("product").value,
+        wo_number: document.getElementById("wo").value,
+        target_quantity: parseInt(document.getElementById("target").value),
+        status: "open"
+      }
+    ]);
+
+  if (error) {
+    alert("Supabase ERROR: " + error.message);
+    console.error("Supabase ERROR:", error);
+  } else {
+    alert("Job card inserted! Check console for data.");
+    console.log("Inserted data:", data);
+    form.reset();
+    loadJobs();
+  }
+});
+
 
       if (error) {
         alert("ERROR: " + error.message);
@@ -107,3 +119,4 @@
 
 </body>
 </html>
+
