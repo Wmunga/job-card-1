@@ -2,114 +2,34 @@
 <html>
 <head>
   <meta charset="UTF-8" />
-  <title>Factory Job Cards</title>
+  <title>Test</title>
 </head>
 <body>
 
-  <h1>Create Job Card</h1>
+<h1>Supabase Test</h1>
 
-  <form id="jobForm">
-    <label>Date:</label>
-    <input type="date" id="date" required>
-    <br><br>
+<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+<script>
+  const supabaseUrl = "https://apfargflldoitmizoeqh.supabase.co";
+  const supabaseKey = "sb_publishable_JrAWzFbrn31s81Q_ajqwhg___eHCeps";
+  const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
-    <label>Shift:</label>
-    <select id="shift">
-      <option value="Day">Day</option>
-      <option value="Night">Night</option>
-    </select>
-    <br><br>
+  async function testConnection() {
+    const { data, error } = await supabase
+      .from("job_cards")
+      .select("*");
 
-    <label>Product:</label>
-    <input type="text" id="product" required>
-    <br><br>
-
-    <label>WO Number:</label>
-    <input type="text" id="wo" required>
-    <br><br>
-
-    <label>Target Quantity:</label>
-    <input type="number" id="target" required>
-    <br><br>
-
-    <button type="submit">Create Job Card</button>
-  </form>
-
-  <hr>
-
-  <h2>Existing Job Cards</h2>
-  <ul id="jobList"></ul>
-
-  <!-- Supabase Library -->
-  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-
-  <script>
-    // 🔹 REPLACE THESE WITH YOUR VALUES
-    const supabaseUrl = "https://apfargflldoitmizoeqh.supabase.co";
-    const supabaseKey = "sb_publishable_JrAWzFbrn31s81Q_ajqwhg___eHCeps";
-
-    const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
-
-    const form = document.getElementById("jobForm");
-    const jobList = document.getElementById("jobList");
-
-    // 🔹 CREATE JOB CARD
-    form.addEventListener("submit", async (e) => {
-      e.preventDefault();
-
-      const { error } = await supabase
-        .from("job_cards")
-        .insert([
-          {
-            date: document.getElementById("date").value,
-            shift: document.getElementById("shift").value,
-            product: document.getElementById("product").value,
-            wo_number: document.getElementById("wo").value,
-            target_quantity: parseInt(document.getElementById("target").value),
-            status: "open"
-          }
-        ]);
-
-      if (error) {
-        alert("ERROR: " + error.message);
-        console.error(error);
-      } else {
-        alert("Job card created successfully!");
-        form.reset();
-        loadJobs();
-      }
-    });
-
-    // 🔹 LOAD JOB CARDS
-    async function loadJobs() {
-      const { data, error } = await supabase
-        .from("job_cards")
-        .select("*")
-        .order("created_at", { ascending: false });
-
-      if (error) {
-        console.error("Load error:", error);
-        return;
-      }
-
-      jobList.innerHTML = "";
-
-      data.forEach(job => {
-        const li = document.createElement("li");
-        li.textContent = 
-          job.date + " | " +
-          job.shift + " | " +
-          job.product + " | WO: " +
-          job.wo_number + " | Target: " +
-          job.target_quantity;
-
-        jobList.appendChild(li);
-      });
+    if (error) {
+      alert("ERROR: " + error.message);
+      console.error(error);
+    } else {
+      alert("Connected successfully!");
+      console.log(data);
     }
+  }
 
-    // 🔹 INITIAL LOAD
-    loadJobs();
-  </script>
+  testConnection();
+</script>
 
 </body>
 </html>
