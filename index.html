@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Factory Job Cards</title>
+</head>
+<body>
+
+  <h1>Create Job Card</h1>
+
+  <form id="jobForm">
+    Date: <input type="date" id="date" required><br><br>
+    Shift:
+    <select id="shift">
+      <option value="Day">Day</option>
+      <option value="Night">Night</option>
+    </select><br><br>
+    Product: <input type="text" id="product" required><br><br>
+    WO Number: <input type="text" id="wo" required><br><br>
+    Target Quantity: <input type="number" id="target" required><br><br>
+    <button type="submit">Create Job Card</button>
+  </form>
+
+  <h2>Existing Job Cards</h2>
+  <ul id="jobList"></ul>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const supabaseUrl = "https://apfargflldoitmizoeqh.supabase.co";
+    const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFwZmFyZ2ZsbGRvaXRtaXpvZXFoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEyNDI4MDksImV4cCI6MjA4NjgxODgwOX0.N76ffeEk7qzG82_XC5ag77Oj4vvZGlbvDFSdsXh8sDM";
+    const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+    const form = document.getElementById("jobForm");
+    const jobList = document.getElementById("jobList");
+
+    // Create Job Card
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const { error } = await supabase
+        .from("job_cards")
+        .insert([
+          {
+            date: document.getElementById("date").value,
+            shift: document.getElementById("shift").value,
+            product: document.getElementById("product").value,
+            wo_number: document.getElementById("wo").value,
+            target_quantity: document.getElementById("target").value
+          }
+        ]);
+
+      if (error) {
+        alert("Error creating job card");
+        console.error(error);
+      } else {
+        alert("Job card created!");
+        loadJobs();
+        form.reset();
+      }
+    });
+
+    // Load Job Cards
+    async function loadJobs() {
+      const { data, error } = await supabase
+        .from("job_cards")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      jobList.innerHTML = "";
+
+      data.forEach(job => {
+        const li = document.createElement("li");
+        li.textContent = `${job.date} | ${job.shift} | ${job.product} | WO: ${job.wo_number} | Target: ${job.target_quantity}`;
+        jobList.appendChild(li);
+      });
+    }
+
+    loadJobs();
+  </script>
+
+</body>
+</html>
